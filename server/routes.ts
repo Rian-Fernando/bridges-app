@@ -8,20 +8,66 @@ import {
   insertAvailabilitySchema,
   insertMeetingSchema,
   insertConflictSchema,
-  insertNotificationSchema
+  insertNotificationSchema,
+  insertFormSchema,
+  insertFormResponseSchema
 } from "@shared/schema";
 import { z } from "zod";
 import { setupAuth } from "./auth";
 import { db } from "./db";
-import { users, subjects, staffExpertise, studentSubjects, availability, meetings, conflicts, activities, notifications } from "@shared/schema";
 import { eq, and, desc, gt, lt, gte, lte } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const apiRouter = express.Router();
   app.use("/api", apiRouter);
 
+  const { requireAuth } = require("./auth");
+
+  // Form routes for semester questions
+  apiRouter.post("/forms", requireAuth, async (req, res) => {
+    try {
+      const formData = insertFormSchema.parse(req.body);
+      const newForm = await storage.createForm(formData);
+      res.status(201).json(newForm);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Failed to create form" });
+    }
+  });
+
+  apiRouter.post("/forms/:formId/responses", requireAuth, async (req, res) => {
+    try {
+      const formId = parseInt(req.params.formId);
+      const responseData = insertFormResponseSchema.parse({
+        ...req.body,
+        formId,
+        userId: req.user.id
+      });
+      const newResponse = await storage.createFormResponse(responseData);
+      res.status(201).json(newResponse);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Failed to submit form response" });
+    }
+  });
+
+  // Automated matching endpoint
+  apiRouter.post("/matching/auto", requireAuth, async (req, res) => {
+    try {
+      const { studentId, type } = req.body;
+      const matches = await storage.findOptimalMatches(studentId, type);
+      res.json(matches);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to find matches" });
+    }
+  });
+
   // User routes
-  apiRouter.get("/users", async (req, res) => {
+  apiRouter.get("/users", requireAuth, async (req, res) => {
     try {
       const role = req.query.role as string | undefined;
       let users;
@@ -208,8 +254,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Meeting routes
-  apiRouter.get("/meetings", async (req, res) => {
+  // Role-based access middleware
+  const checkRole = (allowedRoles: string[]) => async (req: any, res: any, next: any) => {
+    const user = req.user;
+    if (!user || !allowedRoles.includes(user.role)) {
+      return res.status(403).json({ error: "Insufficient permissions" });
+    }
+    next();
+  };
+
+  // Meeting routes with role-based access
+  apiRouter.get("/meetings", checkRole(['STUDENT', 'STUDENT_STAFF', 'PROFESSIONAL_STAFF', 'FACULTY', 'ADMIN']), async (req, res) => {
     try {
       const studentId = req.query.studentId ? parseInt(req.query.studentId as string) : undefined;
       const staffId = req.query.staffId ? parseInt(req.query.staffId as string) : undefined;
@@ -340,6 +395,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: error.errors });
       }
       res.status(500).json({ error: "Failed to update conflict" });
+    }
+  });
+
+  // Faculty-specific routes
+  apiRouter.post("/meetings/:id/request-change", checkRole(['FACULTY', 'ADMIN']), async (req, res) => {
+    try {
+      const meetingId = parseInt(req.params.id);
+      const { newModality, reason } = req.body;
+      
+      const meeting = await storage.getMeeting(meetingId);
+      if (!meeting) {
+        return res.status(404).json({ error: "Meeting not found" });
+      }
+
+      const result = await findAlternativeStaff(meeting, meeting.staffId, newModality);
+      
+      if (!result.success) {
+        return res.status(422).json({ error: result.message });
+      }
+
+      // Create change request
+      const changeRequest = await storage.createMeetingChangeRequest({
+        meetingId,
+        requestedById: req.user.id,
+        newModality,
+        reason,
+        alternativeStaffIds: result.alternativeStaff!.map(s => s.id)
+      });
+
+      res.status(201).json(changeRequest);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to process change request" });
     }
   });
 

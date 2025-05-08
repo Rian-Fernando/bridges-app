@@ -1,0 +1,44 @@
+	•	Integrated time zone support for remote staff/students.
+	•	Session timer or time tracking for each meeting (optional for audits).
+	•	Customizable form builder for admin-created questions each semester.I’m creating a web-based scheduling app called Bridges for the Bridges to Adelphi program, which supports neurodiverse students at Adelphi University. The program involves different meeting types (e.g., LS, COMBO, VC, SC, AC, Check-in) led by student staff or other team members, across Academic, Social, and Vocational departments.
+
+At the start of each semester, both students and staff fill out forms detailing:
+	•	Courses & availability (including in-person/remote)
+	•	Commuter/dorm status
+	•	Preferred meeting times (e.g., spread out vs. back-to-back)
+	•	Subject preferences (for student-staff pairing)
+
+Schedules are then manually created in Google Sheets, and meetings are paired based on all preferences. We also use Sheets to:
+	•	Notify staff using @mentions
+	•	Track conflicts (e.g., dropped classes, student-staff incompatibility)
+	•	Store reports for supervisor review after each meeting
+
+However, this system is manual and inefficient. I want to build a smarter app that:
+	•	Automates student-staff pairings using form data
+	•	Checks in-person feasibility (e.g., avoids forcing commuters to campus for one meeting)
+	•	Displays a transparent weekly view for all users (showing time, location, participants, meeting type)
+	•	Enables staff to submit reports and supervisors to verify them
+	•	Logs conflicts for future scheduling decisions
+
+Design will blend Apple-style minimalism with Adelphi University branding, starting with a web app, and possibly expanding to mobile later.	1.	Login Page:
+	•	Secure sign-in with Adelphi credentials.
+	•	Role selection: Student, Staff, or Admin.
+	2.	Dashboard:
+	•	Students: Overview of upcoming meetings, weekly schedule, and notifications.
+	•	Staff: List of assigned meetings, pending reports, and availability status.
+	•	Admins: Tools for scheduling, conflict resolution, and report management.
+	3.	Weekly Schedule View:
+	•	Interactive calendar displaying meetings with details:
+	•	Type: COMBO, LS, VC, etc.
+	•	Participants: Names of student and staff.
+	•	Time & Location: Including mode (in-person/remote) and room numbers.
+	•	Color-coded meeting types for quick reference.
+	4.	Profile & Preferences:
+	•	Students: Course information, availability, meeting preferences, and commuting status.
+	•	Staff: Subjects of expertise, departments, availability, and commuting details.
+	5.	Meeting Reports:
+	•	Submission forms for staff to report on conducted meetings.
+	•	Review interface for supervisors to validate and comment on reports.
+	6.	Conflict Management:
+	•	Interface for logging and tracking scheduling conflicts.
+	•	History of past conflicts to inform future scheduling decisions.

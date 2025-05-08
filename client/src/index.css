@@ -4,29 +4,39 @@
 
 :root {
   --background: 0 0% 100%;
-  --foreground: 20 14.3% 4.1%;
-  --muted: 60 4.8% 95.9%;
-  --muted-foreground: 25 5.3% 44.7%;
+  --foreground: 14 73% 22%;
+  --muted: 14 30% 95%;
+  --muted-foreground: 14 30% 40%;
   --popover: 0 0% 100%;
-  --popover-foreground: 20 14.3% 4.1%;
+  --popover-foreground: 14 73% 22%;
   --card: 0 0% 100%;
-  --card-foreground: 20 14.3% 4.1%;
-  --border: 20 5.9% 90%;
-  --input: 20 5.9% 90%;
-  --primary: 207 90% 54%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 60 4.8% 95.9%;
-  --secondary-foreground: 24 9.8% 10%;
-  --accent: 60 4.8% 95.9%;
-  --accent-foreground: 24 9.8% 10%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 20 14.3% 4.1%;
-  --radius: 0.5rem;
+  --card-foreground: 14 73% 22%;
+  --border: 14 30% 90%;
+  --input: 14 30% 90%;
+  --primary: 14 73% 22%;
+  --primary-foreground: 50 94% 48%;
+  --secondary: 50 94% 48%;
+  --secondary-foreground: 14 73% 22%;
+  --accent: 207 90% 54%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 4 90% 58%;
+  --destructive-foreground: 0 0% 100%;
+  --ring: 14 73% 22%;
+  --radius: 0.75rem;
   
   /* Adelphi colors */
   --adelphi-brown: 14 73% 22%;
   --adelphi-gold: 50 94% 48%;
+  
+  /* Sensory-friendly themes */
+  --calm-blue: 201 100% 95%;
+  --soft-neutral: 30 20% 95%;
+  --gentle-contrast: 200 15% 85%;
+  --focus-purple: 270 100% 98%;
+  
+  /* Reading assistance */
+  --reading-highlight: 60 100% 90%;
+  --focus-outline: 200 100% 40%;
   
   /* Apple UI colors */
   --apple-blue: 207 90% 54%;
@@ -72,6 +82,56 @@
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 98%;
   --ring: 240 4.9% 83.9%;
+}
+
+/* Focus mode styles */
+body.focus-mode {
+  & .sidebar {
+    opacity: 0.3;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  & .sidebar:hover {
+    opacity: 1;
+  }
+  
+  & .non-essential {
+    display: none;
+  }
+  
+  & .calendar-grid {
+    & .past-event {
+      opacity: 0.5;
+    }
+  }
+}
+
+/* Improved reading experience */
+.readable-content {
+  max-width: 70ch;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode */
+.high-contrast {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --border: 0 0% 0%;
+  
+  & * {
+    border-color: black !important;
+  }
 }
 
 @layer base {

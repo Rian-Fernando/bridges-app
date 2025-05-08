@@ -16,9 +16,18 @@ export const meetingTypeEnum = pgEnum('meeting_type', [
 export const userRoleEnum = pgEnum('user_role', [
   'STUDENT',
   'STUDENT_STAFF',
-  'PROFESSIONAL_STAFF',
+  'PROFESSIONAL_STAFF', 
+  'FACULTY',
   'ADMIN'
 ]);
+
+export const permissionLevels = {
+  STUDENT: ['VIEW_SCHEDULE', 'REQUEST_CHANGES', 'VIEW_MEETINGS'],
+  STUDENT_STAFF: ['VIEW_SCHEDULE', 'REQUEST_CHANGES', 'VIEW_MEETINGS', 'SET_AVAILABILITY'],
+  PROFESSIONAL_STAFF: ['VIEW_SCHEDULE', 'REQUEST_CHANGES', 'VIEW_MEETINGS', 'SET_AVAILABILITY'],
+  FACULTY: ['VIEW_ALL', 'MANAGE_PAIRINGS', 'APPROVE_CHANGES', 'MODIFY_SCHEDULES'],
+  ADMIN: ['VIEW_ALL', 'MANAGE_ALL', 'SYSTEM_CONFIG']
+};
 
 // Enum for meeting outcome
 export const meetingOutcomeEnum = pgEnum('meeting_outcome', [
@@ -251,6 +260,25 @@ export const activities = pgTable("activities", {
 });
 
 // Notifications table
+// Forms for semester questions
+export const forms = pgTable("forms", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  questions: jsonb("questions").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  semester: text("semester").notNull(),
+  type: text("type").notNull(), // STUDENT or STAFF
+});
+
+export const formResponses = pgTable("form_responses", {
+  id: serial("id").primaryKey(),
+  formId: integer("form_id").references(() => forms.id),
+  userId: integer("user_id").references(() => users.id),
+  answers: jsonb("answers").notNull(),
+  submittedAt: timestamp("submitted_at").defaultNow(),
+});
+
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull().references(() => users.id, { onDelete: 'cascade' }),

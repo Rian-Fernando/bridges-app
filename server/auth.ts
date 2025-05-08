@@ -164,10 +164,14 @@ export function setupAuth(app: Express) {
     });
   });
 
-  app.get("/api/user", (req, res) => {
+  export const requireAuth = (req: any, res: any, next: any) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Not authenticated" });
     }
+    next();
+  };
+
+  app.get("/api/user", requireAuth, (req, res) => {
     const user = req.user as SelectUser;
     res.json({
       id: user.id,

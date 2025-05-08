@@ -11,7 +11,8 @@ import NotFound from "@/pages/not-found";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={Landing} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route path="/schedule" component={Schedule} />
       <Route path="/students" component={Students} />
       <Route path="/staff" component={Staff} />
@@ -25,7 +26,11 @@ function Router() {
 }
 
 function App() {
-  return <Router />;
+  return (
+    <ThemeProvider defaultTheme="system" storageKey="bridges-theme">
+      <Router />
+    </ThemeProvider>
+  );
 }
 
 export default App;

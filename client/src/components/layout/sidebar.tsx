@@ -10,7 +10,7 @@ interface SidebarProps {
 
 export function Sidebar({ user, isMobile, onToggle }: SidebarProps) {
   const [location] = useLocation();
-  
+
   const isActive = (path: string) => {
     return location === path;
   };
